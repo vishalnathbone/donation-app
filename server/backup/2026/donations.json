@@ -1,0 +1,17 @@
+[
+  {
+    "id": "DON-2026-000001",
+    "year": 2026,
+    "donorName": "maruti nathbone",
+    "donationTypeId": "TYP-2026-009",
+    "donationTypeName": "GANPATI",
+    "amount": 1001,
+    "paymentMode": "CASH",
+    "donationDate": "2026-08-31",
+    "notes": "",
+    "status": "PENDING",
+    "createdBy": "USR-ADMIN-001",
+    "createdByName": "System Admin",
+    "createdAt": "2026-08-31T14:55:38.757Z"
+  }
+]

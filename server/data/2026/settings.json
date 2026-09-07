@@ -1,0 +1,12 @@
+[
+  {
+    "year": 2026,
+    "orgName": "Shree Krishna Seva Trust",
+    "orgAddress": "108 Divine Complex, Temple Road, Mumbai, Maharashtra - 400001",
+    "orgMobile": "+91 98765 43210",
+    "orgEmail": "info@krishnaseva.org",
+    "receiptPrefix": "REC",
+    "donationPrefix": "DON",
+    "expensePrefix": "EXP"
+  }
+]

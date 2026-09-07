@@ -1,0 +1,90 @@
+[
+  {
+    "id": "TYP-001",
+    "year": 2026,
+    "name": "GENERAL",
+    "description": "General Charitable Trust Donation",
+    "status": "APPROVED",
+    "createdBy": "USR-ADMIN-001",
+    "createdAt": "2026-08-31T09:39:51.323Z",
+    "approvedBy": "USR-ADMIN-001",
+    "approvedAt": "2026-08-31T09:39:51.323Z"
+  },
+  {
+    "id": "TYP-002",
+    "year": 2026,
+    "name": "FESTIVAL",
+    "description": "Festival & Cultural Celebration Fund",
+    "status": "APPROVED",
+    "createdBy": "USR-ADMIN-001",
+    "createdAt": "2026-08-31T09:39:51.323Z",
+    "approvedBy": "USR-ADMIN-001",
+    "approvedAt": "2026-08-31T09:39:51.323Z"
+  },
+  {
+    "id": "TYP-003",
+    "year": 2026,
+    "name": "EDUCATION",
+    "description": "Child Education & Student Sponsorship",
+    "status": "APPROVED",
+    "createdBy": "USR-ADMIN-001",
+    "createdAt": "2026-08-31T09:39:51.323Z",
+    "approvedBy": "USR-ADMIN-001",
+    "approvedAt": "2026-08-31T09:39:51.323Z"
+  },
+  {
+    "id": "TYP-004",
+    "year": 2026,
+    "name": "MEDICAL",
+    "description": "Medical Emergency & Healthcare Assistance",
+    "status": "APPROVED",
+    "createdBy": "USR-ADMIN-001",
+    "createdAt": "2026-08-31T09:39:51.323Z",
+    "approvedBy": "USR-ADMIN-001",
+    "approvedAt": "2026-08-31T09:39:51.323Z"
+  },
+  {
+    "id": "TYP-005",
+    "year": 2026,
+    "name": "FOOD",
+    "description": "Annadan & Community Meals Service",
+    "status": "APPROVED",
+    "createdBy": "USR-ADMIN-001",
+    "createdAt": "2026-08-31T09:39:51.323Z",
+    "approvedBy": "USR-ADMIN-001",
+    "approvedAt": "2026-08-31T09:39:51.323Z"
+  },
+  {
+    "id": "TYP-006",
+    "year": 2026,
+    "name": "BUILDING",
+    "description": "Infrastructure & Temple Construction",
+    "status": "APPROVED",
+    "createdBy": "USR-ADMIN-001",
+    "createdAt": "2026-08-31T09:39:51.323Z",
+    "approvedBy": "USR-ADMIN-001",
+    "approvedAt": "2026-08-31T09:39:51.323Z"
+  },
+  {
+    "id": "TYP-007",
+    "year": 2026,
+    "name": "ANNADAN",
+    "description": "Special Annadan Seva Drive",
+    "status": "APPROVED",
+    "createdBy": "USR-ADMIN-001",
+    "createdAt": "2026-08-31T09:39:51.323Z",
+    "approvedBy": "USR-ADMIN-001",
+    "approvedAt": "2026-08-31T09:39:51.323Z"
+  },
+  {
+    "id": "TYP-008",
+    "year": 2026,
+    "name": "OTHER",
+    "description": "Miscellaneous Support",
+    "status": "APPROVED",
+    "createdBy": "USR-ADMIN-001",
+    "createdAt": "2026-08-31T09:39:51.323Z",
+    "approvedBy": "USR-ADMIN-001",
+    "approvedAt": "2026-08-31T09:39:51.323Z"
+  }
+]

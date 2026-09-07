@@ -1,0 +1,35 @@
+[
+  {
+    "id": "USR-ADMIN-001",
+    "name": "System Admin",
+    "email": "admin@donation.org",
+    "passwordHash": "$2a$10$hG24kcMygjSKgvjfMyuYReEDZZCNGqhpJGH.rwUmCE0fJo9munQkq",
+    "role": "ADMIN",
+    "status": "ACTIVE",
+    "mobile": "9876543210",
+    "createdAt": "2026-08-31T09:39:51.084Z",
+    "updatedAt": "2026-08-31T09:39:51.084Z"
+  },
+  {
+    "id": "USR-COLL-001",
+    "name": "Rajesh Sharma",
+    "email": "collector@donation.org",
+    "passwordHash": "$2a$10$EMNidFMuQ7ua.hxgwmh.pOR6mMM4LpZUz85Yv8GuVRXL5cWfyqI.i",
+    "role": "COLLECTOR",
+    "status": "ACTIVE",
+    "mobile": "9876543211",
+    "createdAt": "2026-08-31T09:39:51.084Z",
+    "updatedAt": "2026-08-31T09:39:51.084Z"
+  },
+  {
+    "id": "USR-VIEW-001",
+    "name": "Auditor Viewer",
+    "email": "viewer@donation.org",
+    "passwordHash": "$2a$10$SXC64IfCefz7lD4qx0Si1utRO82tqVTqpEhwuTufoyhafia2rs0sC",
+    "role": "VIEWER",
+    "status": "ACTIVE",
+    "mobile": "9876543212",
+    "createdAt": "2026-08-31T09:39:51.084Z",
+    "updatedAt": "2026-08-31T09:39:51.084Z"
+  }
+]
