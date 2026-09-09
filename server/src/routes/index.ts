@@ -23,7 +23,7 @@ import {
 const router = Router();
 
 // ==========================================
-// 1. AUTH ROUTES (Not year-prefixed)
+// 1. AUTH ROUTES (Both /api/auth and /api/:year/auth)
 // ==========================================
 const authRouter = Router();
 authRouter.post('/login', validateBody(LoginSchema), AuthController.login);
@@ -37,6 +37,7 @@ router.use('/auth', authRouter);
 // 2. YEAR-SCOPED ROUTES (/api/:year/...)
 // ==========================================
 const yearRouter = Router({ mergeParams: true });
+yearRouter.use('/auth', authRouter);
 
 // --- DONATIONS ---
 yearRouter.get('/donations', authenticate, DonationController.getDonations);

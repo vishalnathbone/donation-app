@@ -25,8 +25,9 @@ export const WebLoginScreen: React.FC<WebLoginScreenProps> = ({ setCurrentScreen
 
     try {
       const res = await apiClient.post(`/api/${selectedYear}/auth/login`, { email, password });
-      if (res.data.token && res.data.user) {
-        setAuth(res.data.user, res.data.token);
+      const authData = res.data.data ?? res.data;
+      if (authData?.token && authData?.user) {
+        setAuth(authData.user, authData.token);
         setCurrentScreen('dashboard');
       } else {
         setError('Invalid response from server');
@@ -42,7 +43,7 @@ export const WebLoginScreen: React.FC<WebLoginScreenProps> = ({ setCurrentScreen
           status: 'ACTIVE',
           createdAt: new Date().toISOString(),
         },
-        'demo_jwt_token'
+        'demo_token'
       );
       setCurrentScreen('dashboard');
     } finally {
