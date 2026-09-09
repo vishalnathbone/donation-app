@@ -148,6 +148,10 @@ export const AppContent: React.FC = () => {
     }
   };
 
+  if (!isAuthenticated) {
+    return <WebLoginScreen setCurrentScreen={setCurrentScreen} />;
+  }
+
   return (
     <>
       <WebContainer

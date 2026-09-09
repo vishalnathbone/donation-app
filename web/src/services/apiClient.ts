@@ -12,12 +12,10 @@ export const apiClient = axios.create({
 
 apiClient.interceptors.request.use(
   (config) => {
-    let token = safeStorage.getItem('token');
-    if (!token) {
-      token = 'demo_token';
-      safeStorage.setItem('token', token);
+    const token = safeStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
     }
-    config.headers.Authorization = `Bearer ${token}`;
     return config;
   },
   (error) => Promise.reject(error)

@@ -22,31 +22,20 @@ const getStoredUser = (): User | null => {
 };
 
 const getStoredToken = (): string | null => {
-  let token = safeStorage.getItem('token');
-  if (!token) {
-    token = 'demo_token';
-    safeStorage.setItem('token', token);
-    safeStorage.setItem('isLoggedIn', 'true');
-    safeStorage.setItem('hasCompletedOnboarding', 'true');
-  }
-  return token;
+  return safeStorage.getItem('token');
 };
 
 const getStoredOnboarding = (): boolean => {
   return safeStorage.getItem('hasCompletedOnboarding') === 'true';
 };
 
+const initialUser = getStoredUser();
+const initialToken = getStoredToken();
+
 export const useAuthStore = create<AuthState>((set) => ({
-  user: getStoredUser() || {
-    id: 'USR-ADMIN-001',
-    name: 'System Admin',
-    email: 'admin@donation.org',
-    role: 'ADMIN',
-    status: 'ACTIVE',
-    createdAt: new Date().toISOString(),
-  },
-  token: getStoredToken(),
-  isAuthenticated: !!getStoredToken(),
+  user: initialUser,
+  token: initialToken,
+  isAuthenticated: !!(initialToken && initialUser),
   hasCompletedOnboarding: getStoredOnboarding(),
 
   setAuth: (user, token) => {
