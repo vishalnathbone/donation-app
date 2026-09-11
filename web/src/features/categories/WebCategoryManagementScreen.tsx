@@ -7,12 +7,14 @@ import {
   useRejectDonationType,
 } from '../../hooks/useDonationQueries';
 import { useAuthStore } from '../../store/authStore';
+import { useLanguageStore } from '../../store/languageStore';
 import { StatusBadge } from '../../components/StatusBadge';
 import { RejectionModal } from '../../components/RejectionModal';
 import { Layers, Plus, CheckCircle2, XCircle, Tag, Search } from '../../utils/icons';
 
 export const WebCategoryManagementScreen: React.FC = () => {
   const { user } = useAuthStore();
+  const { t } = useLanguageStore();
   const [showAddModal, setShowAddModal] = useState(false);
   const [typeName, setTypeName] = useState('');
   const [typeDesc, setTypeDesc] = useState('');
@@ -60,7 +62,7 @@ export const WebCategoryManagementScreen: React.FC = () => {
   const filteredTypes = allTypes.filter(
     (t) =>
       t.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      t.id.toLowerCase().includes(searchTerm.toLowerCase())
+      (t.description && t.description.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
   return (
@@ -70,7 +72,7 @@ export const WebCategoryManagementScreen: React.FC = () => {
         <div>
           <h2 className="text-xl lg:text-2xl font-black text-white tracking-tight flex items-center gap-2">
             <Tag size={24} color="#818cf8" />
-            <span>Donation Purpose Categories</span>
+            <span>{t('donationCategories')}</span>
           </h2>
           <p className="text-xs text-slate-300 mt-1">
             Configure purpose categories, manage approval workflows, and tag donor contributions.
@@ -83,7 +85,7 @@ export const WebCategoryManagementScreen: React.FC = () => {
             className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold text-xs shadow-lg shadow-indigo-600/30 transition-all cursor-pointer shrink-0"
           >
             <Plus size={16} />
-            <span>Add New Category</span>
+            <span>{t('addCategory')}</span>
           </button>
         )}
       </div>

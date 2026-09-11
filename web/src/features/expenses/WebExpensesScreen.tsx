@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { ScreenId } from '../../components/WebContainer';
 import { useExpenses, useApproveExpense, useRejectExpense } from '../../hooks/useDonationQueries';
 import { useAuthStore } from '../../store/authStore';
+import { useLanguageStore } from '../../store/languageStore';
 import { Expense } from '../../types';
 import { formatCurrency, formatDate } from '../../utils/formatters';
 import { StatusBadge } from '../../components/StatusBadge';
@@ -23,6 +24,7 @@ interface WebExpensesScreenProps {
 
 export const WebExpensesScreen: React.FC<WebExpensesScreenProps> = () => {
   const { user } = useAuthStore();
+  const { t } = useLanguageStore();
   const { data: expenses = [], isLoading } = useExpenses();
   const approveMutation = useApproveExpense();
   const rejectMutation = useRejectExpense();
@@ -65,7 +67,7 @@ export const WebExpensesScreen: React.FC<WebExpensesScreenProps> = () => {
         <div>
           <h2 className="text-xl lg:text-2xl font-black text-white tracking-tight flex items-center gap-2">
             <DollarSign size={24} color="#f43f5e" />
-            <span>Expenses Management</span>
+            <span>{t('expensesDirectory')}</span>
           </h2>
           <p className="text-xs text-slate-300 mt-1">
             Submit expense claims, review category budgets, attach receipts, and handle ADMIN approvals.
@@ -77,7 +79,7 @@ export const WebExpensesScreen: React.FC<WebExpensesScreenProps> = () => {
           className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs shadow-lg shadow-rose-600/30 transition-all cursor-pointer shrink-0"
         >
           <Plus size={16} />
-          <span>Submit Expense Claim</span>
+          <span>{t('recordNewExpense')}</span>
         </button>
       </div>
 
@@ -87,7 +89,7 @@ export const WebExpensesScreen: React.FC<WebExpensesScreenProps> = () => {
           <Search size={16} className="absolute left-3.5 top-3 text-slate-400 pointer-events-none" />
           <input
             type="text"
-            placeholder="Search expense title, reference, or expense ID..."
+            placeholder={t('searchPlaceholder')}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full bg-slate-900 border border-slate-700 rounded-xl pl-10 pr-4 py-2 text-xs font-semibold text-white placeholder-slate-400 focus:outline-none focus:border-indigo-500"
@@ -101,7 +103,7 @@ export const WebExpensesScreen: React.FC<WebExpensesScreenProps> = () => {
             onChange={(e) => setSelectedStatus(e.target.value)}
             className="bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs font-bold text-slate-200 focus:outline-none focus:border-indigo-500 cursor-pointer"
           >
-            <option value="ALL">All Statuses</option>
+            <option value="ALL">{t('allStatuses')}</option>
             <option value="PENDING">PENDING Only</option>
             <option value="APPROVED">APPROVED Only</option>
             <option value="REJECTED">REJECTED Only</option>
@@ -122,13 +124,13 @@ export const WebExpensesScreen: React.FC<WebExpensesScreenProps> = () => {
                 <tr>
                   <th className="py-3 px-4">Expense ID</th>
                   <th className="py-3 px-4">Title / Description</th>
-                  <th className="py-3 px-4">Category</th>
+                  <th className="py-3 px-4">{t('category')}</th>
                   <th className="py-3 px-4">Reference</th>
-                  <th className="py-3 px-4">Amount</th>
-                  <th className="py-3 px-4">Date</th>
+                  <th className="py-3 px-4">{t('amount')}</th>
+                  <th className="py-3 px-4">{t('date')}</th>
                   <th className="py-3 px-4">Submitted By</th>
-                  <th className="py-3 px-4">Status</th>
-                  <th className="py-3 px-4 text-center">Actions</th>
+                  <th className="py-3 px-4">{t('status')}</th>
+                  <th className="py-3 px-4 text-center">{t('actions')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-700/50 font-medium">

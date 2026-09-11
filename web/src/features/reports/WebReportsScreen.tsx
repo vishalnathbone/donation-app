@@ -1,5 +1,9 @@
 import React, { useState } from 'react';
-import { useCollectionSummary, useFinancialSummary } from '../../hooks/useDonationQueries';
+import {
+  useCollectionSummary,
+  useFinancialSummary,
+  useAllDonationTypes,
+} from '../../hooks/useDonationQueries';
 import { useYearStore } from '../../store/yearStore';
 import { formatCurrency } from '../../utils/formatters';
 import {
@@ -13,15 +17,33 @@ import {
   Wallet,
 } from '../../utils/icons';
 
+import { useAuthStore } from '../../store/authStore';
+import { useLanguageStore } from '../../store/languageStore';
+
 export const WebReportsScreen: React.FC = () => {
   const { selectedYear } = useYearStore();
+  const { t } = useLanguageStore();
   const { data: collectionReport, isLoading: isCollLoading } = useCollectionSummary();
   const { data: financialReport, isLoading: isFinLoading } = useFinancialSummary();
+  const { data: donationTypes = [] } = useAllDonationTypes();
 
   const [activeTab, setActiveTab] = useState<'COLLECTION' | 'FINANCIAL'>('COLLECTION');
+  const [exportType, setExportType] = useState<string>('ALL');
 
   const handleExportExcel = () => {
-    window.open(`/api/${selectedYear}/export/full`, '_blank');
+    let baseUrl = `/api/${selectedYear}/export/full`;
+    const params = new URLSearchParams();
+    if (exportType && exportType !== 'ALL') {
+      baseUrl = `/api/${selectedYear}/export/donations`;
+      params.append('donationType', exportType);
+    }
+    const token = useAuthStore.getState().token;
+    if (token) {
+      params.append('token', token);
+    }
+    const queryString = params.toString();
+    const finalUrl = queryString ? `${baseUrl}?${queryString}` : baseUrl;
+    window.open(finalUrl, '_blank');
   };
 
   const totalCollAmount = collectionReport?.totalAmount || 0;
@@ -66,24 +88,39 @@ export const WebReportsScreen: React.FC = () => {
       <div className="bg-slate-800/90 border border-slate-700/80 rounded-2xl p-6 shadow-lg flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <span className="text-xs font-extrabold uppercase tracking-widest text-indigo-400">
-            Financial Year {selectedYear} - {selectedYear + 1}
+            {t('financialYear')} {selectedYear} - {selectedYear + 1}
           </span>
           <h2 className="text-xl lg:text-2xl font-black text-white tracking-tight flex items-center gap-2 mt-0.5">
             <BarChart3 size={24} color="#818cf8" />
-            <span>Reports & Financial Statements</span>
+            <span>{t('reportsExcel')}</span>
           </h2>
           <p className="text-xs text-slate-300 mt-1">
             Collection analytics, payment mode breakdowns, expense audits, and 5-sheet official Excel exports.
           </p>
         </div>
 
-        <button
-          onClick={handleExportExcel}
-          className="flex items-center gap-2 px-5 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold text-xs shadow-lg shadow-indigo-600/30 transition-all cursor-pointer shrink-0"
-        >
-          <FileSpreadsheet size={18} />
-          <span>Download 5-Sheet Excel (.xlsx)</span>
-        </button>
+        <div className="flex flex-col sm:flex-row items-center gap-3 shrink-0">
+          <select
+            value={exportType}
+            onChange={(e) => setExportType(e.target.value)}
+            className="bg-slate-900 border border-slate-700 rounded-xl px-3 py-2.5 text-xs font-bold text-indigo-300 focus:outline-none focus:border-indigo-500 cursor-pointer w-full sm:w-auto"
+          >
+            <option value="ALL">All Purpose Categories (Full 5+ Sheets)</option>
+            {donationTypes.map((t) => (
+              <option key={t.id} value={t.name}>
+                Category: {t.name}
+              </option>
+            ))}
+          </select>
+
+          <button
+            onClick={handleExportExcel}
+            className="w-full sm:w-auto flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold text-xs shadow-lg shadow-indigo-600/30 transition-all cursor-pointer shrink-0"
+          >
+            <FileSpreadsheet size={18} />
+            <span>Export Excel (.xlsx)</span>
+          </button>
+        </div>
       </div>
 
       {/* Report Type Tabs */}

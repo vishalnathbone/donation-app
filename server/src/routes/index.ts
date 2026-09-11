@@ -8,6 +8,7 @@ import { ReportController } from '../controllers/reportController';
 import { ExcelController } from '../controllers/excelController';
 import { UserController } from '../controllers/userController';
 import { AuditController } from '../controllers/auditController';
+import { SettingsController } from '../controllers/settingsController';
 
 import { authenticate, authorize } from '../middleware/authMiddleware';
 import { validateBody } from '../middleware/validateMiddleware';
@@ -135,10 +136,10 @@ yearRouter.get('/reports/summary', authenticate, ReportController.getCollectionS
 yearRouter.get('/reports/expense-summary', authenticate, ReportController.getExpenseSummary);
 
 // --- EXCEL EXPORTS ---
-yearRouter.get('/export/donations', authenticate, authorize('ADMIN'), ExcelController.exportDonations);
-yearRouter.get('/export/expenses', authenticate, authorize('ADMIN'), ExcelController.exportExpenses);
-yearRouter.get('/export/summary', authenticate, authorize('ADMIN'), ExcelController.exportSummary);
-yearRouter.get('/export/full', authenticate, authorize('ADMIN'), ExcelController.exportFullReport);
+yearRouter.get('/export/donations', authenticate, authorize('ADMIN', 'COLLECTOR', 'VIEWER'), ExcelController.exportDonations);
+yearRouter.get('/export/expenses', authenticate, authorize('ADMIN', 'COLLECTOR', 'VIEWER'), ExcelController.exportExpenses);
+yearRouter.get('/export/summary', authenticate, authorize('ADMIN', 'COLLECTOR', 'VIEWER'), ExcelController.exportSummary);
+yearRouter.get('/export/full', authenticate, authorize('ADMIN', 'COLLECTOR', 'VIEWER'), ExcelController.exportFullReport);
 
 // --- USERS MANAGEMENT ---
 yearRouter.get('/users', authenticate, authorize('ADMIN'), UserController.getUsers);
@@ -153,6 +154,10 @@ yearRouter.patch('/users/:id/status', authenticate, authorize('ADMIN'), UserCont
 
 // --- AUDIT LOGS ---
 yearRouter.get('/audit-logs', authenticate, authorize('ADMIN'), AuditController.getLogs);
+
+// --- RECEIPT & SETTINGS (HEADER / FOOTER IMAGE UPLOAD) ---
+yearRouter.get('/settings', authenticate, SettingsController.getSettings);
+yearRouter.put('/settings', authenticate, authorize('ADMIN'), SettingsController.updateSettings);
 
 router.use('/:year([0-9]{4})', yearRouter);
 

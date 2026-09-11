@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useUsers, useCreateUser } from '../../hooks/useDonationQueries';
 import { useYearStore } from '../../store/yearStore';
+import { useLanguageStore } from '../../store/languageStore';
 import { apiClient } from '../../services/apiClient';
 import { StatusBadge } from '../../components/StatusBadge';
 import { UserPlus, ShieldCheck, UserCheck, Eye, Power, Users as UsersIcon, Search } from '../../utils/icons';
@@ -8,6 +9,7 @@ import { useQueryClient } from '@tanstack/react-query';
 
 export const WebUserManagementScreen: React.FC = () => {
   const { selectedYear } = useYearStore();
+  const { t } = useLanguageStore();
   const queryClient = useQueryClient();
   const { data: users = [], isLoading } = useUsers();
   const createUserMutation = useCreateUser();
@@ -62,7 +64,7 @@ export const WebUserManagementScreen: React.FC = () => {
         </span>
       );
     return (
-      <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-950/80 border border-blue-700/60 text-blue-300 text-[10px] font-black uppercase">
+      <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-slate-800 border border-slate-700 text-slate-300 text-[10px] font-black uppercase">
         <Eye size={12} />
         VIEWER
       </span>
@@ -73,7 +75,7 @@ export const WebUserManagementScreen: React.FC = () => {
     (u) =>
       u.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       u.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      u.id.toLowerCase().includes(searchTerm.toLowerCase())
+      (u.mobile && u.mobile.includes(searchTerm))
   );
 
   return (
@@ -83,7 +85,7 @@ export const WebUserManagementScreen: React.FC = () => {
         <div>
           <h2 className="text-xl lg:text-2xl font-black text-white tracking-tight flex items-center gap-2">
             <UsersIcon size={24} color="#818cf8" />
-            <span>User Accounts & Permissions</span>
+            <span>{t('userManagement')}</span>
           </h2>
           <p className="text-xs text-slate-300 mt-1">
             Manage system administrators, donation collectors, and read-only financial auditors.
@@ -95,7 +97,7 @@ export const WebUserManagementScreen: React.FC = () => {
           className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold text-xs shadow-lg shadow-indigo-600/30 transition-all cursor-pointer shrink-0"
         >
           <UserPlus size={16} />
-          <span>Create User Account</span>
+          <span>{t('addUser')}</span>
         </button>
       </div>
 

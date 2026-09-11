@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { ScreenId } from '../../components/WebContainer';
 import { useDashboardSummary, useDonations, useExpenses } from '../../hooks/useDonationQueries';
 import { useYearStore } from '../../store/yearStore';
+import { useLanguageStore } from '../../store/languageStore';
 import { formatCurrency, formatDate } from '../../utils/formatters';
 import {
   TrendingUp,
@@ -28,6 +29,7 @@ interface WebDashboardScreenProps {
 
 export const WebDashboardScreen: React.FC<WebDashboardScreenProps> = ({ setCurrentScreen }) => {
   const { selectedYear } = useYearStore();
+  const { t } = useLanguageStore();
   const { data: summary, isLoading: isSummaryLoading } = useDashboardSummary();
   const { data: donations = [] } = useDonations();
   const { data: expenses = [] } = useExpenses();
@@ -95,7 +97,7 @@ export const WebDashboardScreen: React.FC<WebDashboardScreenProps> = ({ setCurre
             <TrendingUp size={24} color="#10b981" />
           </div>
           <span className="text-xs font-extrabold uppercase tracking-wider text-emerald-400">
-            Total Collection (APPROVED)
+            {t('totalCollection')} (APPROVED)
           </span>
           <h3 className="text-2xl lg:text-3xl font-black text-white mt-2">
             {formatCurrency(totalCollection)}
@@ -112,7 +114,7 @@ export const WebDashboardScreen: React.FC<WebDashboardScreenProps> = ({ setCurre
             <TrendingDown size={24} color="#f43f5e" />
           </div>
           <span className="text-xs font-extrabold uppercase tracking-wider text-rose-400">
-            Total Expenses (APPROVED)
+            {t('totalExpenses')} (APPROVED)
           </span>
           <h3 className="text-2xl lg:text-3xl font-black text-white mt-2">
             {formatCurrency(totalExpenses)}
@@ -129,7 +131,7 @@ export const WebDashboardScreen: React.FC<WebDashboardScreenProps> = ({ setCurre
             <Wallet size={24} color="#6366f1" />
           </div>
           <span className="text-xs font-extrabold uppercase tracking-wider text-indigo-400">
-            Net Available Balance
+            {t('netBalance')}
           </span>
           <h3 className="text-2xl lg:text-3xl font-black text-white mt-2">
             {formatCurrency(netBalance)}

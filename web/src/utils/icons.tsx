@@ -108,3 +108,7 @@ export const Monitor = createIcon('🖥️');
 export const Smartphone = createIcon('📱');
 export const Menu = createIcon('☰');
 export const ChevronRight = createIcon('▸');
+export const Image = createIcon('🖼️');
+export const Trash2 = createIcon('🗑️');
+export const Sparkles = createIcon('✨');
+export const Type = createIcon('🔤');

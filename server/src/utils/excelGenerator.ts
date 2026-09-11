@@ -230,6 +230,53 @@ export async function generateExcelWorkbook(
   sheetFinSummary.addRow({ metric: 'Pending Collection (Unapproved)', amount: pendingCollection });
   sheetFinSummary.addRow({ metric: 'Pending Expenses (Unapproved)', amount: pendingExpenses });
 
+  // ==========================================
+  // SHEET 6+: DEDICATED WORKSHEETS PER DONATION TYPE
+  // ==========================================
+  const categoriesPresent = Array.from(new Set(filteredDonations.map((d) => d.donationTypeName || 'GENERAL')));
+  categoriesPresent.forEach((catName) => {
+    const sanitizedTitle = catName.replace(/[\/*?:\[\]]/g, '').substring(0, 20);
+    const catSheet = workbook.addWorksheet(`Type - ${sanitizedTitle}`);
+    catSheet.columns = [
+      { header: 'Donation ID', key: 'id', width: 18 },
+      { header: 'Receipt Number', key: 'receiptNo', width: 18 },
+      { header: 'Date', key: 'donationDate', width: 14 },
+      { header: 'Donor Name', key: 'donorName', width: 25 },
+      { header: 'Mobile', key: 'mobileNumber', width: 15 },
+      { header: 'Donation Type', key: 'donationTypeName', width: 20 },
+      { header: 'Amount (₹)', key: 'amount', width: 15 },
+      { header: 'Payment Mode', key: 'paymentMode', width: 16 },
+      { header: 'Transaction Ref', key: 'transactionRef', width: 22 },
+      { header: 'Collector', key: 'createdByName', width: 20 },
+      { header: 'Status', key: 'status', width: 14 },
+      { header: 'Approved By', key: 'confirmedByName', width: 20 },
+    ];
+
+    catSheet.getRow(1).eachCell((cell) => {
+      cell.fill = headerFill;
+      cell.font = headerFont;
+    });
+
+    filteredDonations
+      .filter((d) => (d.donationTypeName || 'GENERAL') === catName)
+      .forEach((d) => {
+        catSheet.addRow({
+          id: d.id,
+          receiptNo: d.receiptNo || 'N/A',
+          donationDate: d.donationDate,
+          donorName: d.donorName,
+          mobileNumber: d.mobileNumber || '',
+          donationTypeName: d.donationTypeName,
+          amount: d.amount,
+          paymentMode: d.paymentMode,
+          transactionRef: d.transactionRef || '',
+          createdByName: d.createdByName,
+          status: d.status,
+          confirmedByName: d.confirmedByName || 'N/A',
+        });
+      });
+  });
+
   const buffer = await workbook.xlsx.writeBuffer();
   return Buffer.from(buffer);
 }

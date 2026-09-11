@@ -1,114 +1,186 @@
 import PDFDocument from 'pdfkit';
 import fs from 'fs';
-import path from 'path';
 import { Donation, Settings } from '../models/types';
 import { numberToWordsIndian, formatCurrencyIN } from './numberToWords';
+
+import path from 'path';
+import { JsonStorageHelper } from './jsonStorage';
+
+function parseImageBuffer(str?: string): Buffer | null {
+  if (!str) return null;
+  try {
+    if (str.startsWith('data:image/')) {
+      const base64Data = str.split(',')[1];
+      return Buffer.from(base64Data, 'base64');
+    }
+    if (fs.existsSync(str)) {
+      return fs.readFileSync(str);
+    }
+  } catch {
+    return null;
+  }
+  return null;
+}
 
 export async function generateReceiptPdf(
   donation: Donation,
   receiptNo: string,
   settings: Settings,
-  outputPath: string
+  outputPath: string,
+  _lang?: string
 ): Promise<void> {
-  return new Promise((resolve, reject) => {
-    const doc = new PDFDocument({ size: 'A4', margin: 40 });
-    const writeStream = fs.createWriteStream(outputPath);
+  return new Promise(async (resolve, reject) => {
+    // Custom label text with fallback to English defaults
+    const receiptNoLbl = settings.receiptNoLabel || 'RECEIPT NO';
+    const dateLbl = settings.dateLabel || 'DATE';
+    const idLbl = settings.idLabel || 'ID';
+    const donorNameLbl = settings.donorNameLabel || 'Donor Name:';
+    const purposeLbl = settings.purposeLabel || 'Purpose:';
+    const paymentModeLbl = settings.paymentModeLabel || 'Payment Mode:';
+    const refLbl = settings.refLabel || 'Ref:';
+    const amountLbl = settings.amountLabel || 'Amount (Rs.):';
+    const amountInWordsLbl = settings.amountInWordsLabel || 'Amount in Words:';
+    const signatoryLbl = settings.signatoryLabel || 'Authorized Signatory';
+    const thanksNotesLbl = settings.thanksNotes || 'Thank you for your generous contribution and support!';
 
+    // Exact dimensions: 22 cm x 11 cm
+    // 1 cm = 28.3464567 pt
+    const PAGE_WIDTH = 623.62;  // 22.0 cm
+    const PAGE_HEIGHT = 311.81; // 11.0 cm
+    const HEADER_HEIGHT = 70.87; // 2.5 cm
+    const BODY_HEIGHT = 184.25;  // 6.5 cm
+    const FOOTER_HEIGHT = 56.69; // 2.0 cm
+
+    const doc = new PDFDocument({
+      size: [PAGE_WIDTH, PAGE_HEIGHT],
+      margin: 0,
+    });
+
+    const writeStream = fs.createWriteStream(outputPath);
     doc.pipe(writeStream);
 
-    // Primary Colors
-    const primaryColor = '#1e3a8a'; // Deep Navy
-    const secondaryColor = '#0d9488'; // Teal Accent
-    const darkText = '#1f2937';
-    const lightBg = '#f8fafc';
-    const borderColor = '#e2e8f0';
+    // Fallback: Check data/<year>/receipt-templates/ for header.png and footer.png if not in settings object
+    const yearDir = await JsonStorageHelper.ensureYearDir(settings.year || donation.year || 2026);
+    const templateDir = path.join(yearDir, 'receipt-templates');
 
-    // Header Background Box
-    doc.rect(40, 40, 515, 90).fill(lightBg);
-    doc.rect(40, 40, 515, 90).stroke(primaryColor);
-
-    // Organization Header
-    doc.fillColor(primaryColor).fontSize(20).font('Helvetica-Bold').text(settings.orgName.toUpperCase(), 55, 55, { align: 'center' });
-    doc.fillColor(darkText).fontSize(10).font('Helvetica').text(settings.orgAddress, 55, 82, { align: 'center' });
-    doc.fontSize(9).text(`Phone: ${settings.orgMobile} | Email: ${settings.orgEmail}`, 55, 98, { align: 'center' });
-
-    // Receipt Title Badge
-    doc.rect(200, 145, 195, 26).fill(secondaryColor);
-    doc.fillColor('#ffffff').fontSize(12).font('Helvetica-Bold').text('DONATION RECEIPT', 200, 152, { align: 'center' });
-
-    // Receipt Metadata Bar (Receipt No, Date, Donation ID)
-    const yMeta = 185;
-    doc.rect(40, yMeta, 515, 30).fill('#f1f5f9').stroke(borderColor);
-    doc.fillColor(darkText).fontSize(9).font('Helvetica-Bold');
-    doc.text(`RECEIPT NO: `, 50, yMeta + 10);
-    doc.fillColor(primaryColor).text(receiptNo, 120, yMeta + 10);
-
-    doc.fillColor(darkText).text(`DONATION ID: `, 240, yMeta + 10);
-    doc.fillColor(primaryColor).text(donation.id, 315, yMeta + 10);
-
-    doc.fillColor(darkText).text(`DATE: `, 430, yMeta + 10);
-    doc.fillColor(darkText).font('Helvetica').text(donation.donationDate, 465, yMeta + 10);
-
-    // Donor Details Section
-    let yDonor = 230;
-    doc.fillColor(primaryColor).fontSize(11).font('Helvetica-Bold').text('DONOR DETAILS', 40, yDonor);
-    doc.rect(40, yDonor + 15, 515, 75).stroke(borderColor);
-
-    doc.fillColor(darkText).fontSize(10).font('Helvetica-Bold').text('Donor Name:', 50, yDonor + 25);
-    doc.font('Helvetica').text(donation.donorName, 140, yDonor + 25);
-
-    doc.font('Helvetica-Bold').text('Mobile Number:', 50, yDonor + 45);
-    doc.font('Helvetica').text(donation.mobileNumber || 'N/A', 140, yDonor + 45);
-
-    doc.font('Helvetica-Bold').text('Email:', 310, yDonor + 45);
-    doc.font('Helvetica').text(donation.email || 'N/A', 360, yDonor + 45);
-
-    doc.font('Helvetica-Bold').text('Address:', 50, yDonor + 65);
-    doc.font('Helvetica').text(donation.address || 'N/A', 140, yDonor + 65, { width: 400 });
-
-    // Contribution & Payment Details Section
-    let yPayment = 335;
-    doc.fillColor(primaryColor).fontSize(11).font('Helvetica-Bold').text('DONATION & PAYMENT DETAILS', 40, yPayment);
-    doc.rect(40, yPayment + 15, 515, 100).stroke(borderColor);
-
-    doc.fillColor(darkText).fontSize(10).font('Helvetica-Bold').text('Donation Type:', 50, yPayment + 25);
-    doc.font('Helvetica').text(donation.donationTypeName, 150, yPayment + 25);
-
-    doc.font('Helvetica-Bold').text('Payment Mode:', 310, yPayment + 25);
-    doc.font('Helvetica').text(donation.paymentMode, 400, yPayment + 25);
-
-    doc.font('Helvetica-Bold').text('Transaction Ref:', 50, yPayment + 48);
-    doc.font('Helvetica').text(donation.transactionRef || 'N/A', 150, yPayment + 48);
-
-    doc.font('Helvetica-Bold').text('Amount Received:', 50, yPayment + 72);
-    doc.fillColor(secondaryColor).fontSize(14).font('Helvetica-Bold').text(formatCurrencyIN(donation.amount), 150, yPayment + 70);
-
-    // Amount in Words
-    doc.rect(40, 460, 515, 30).fill('#fef3c7').stroke('#f59e0b');
-    doc.fillColor('#92400e').fontSize(10).font('Helvetica-Bold').text('Amount in Words:', 50, 470);
-    doc.fillColor('#78350f').font('Helvetica-Bold').text(numberToWordsIndian(donation.amount), 160, 470);
-
-    // Notes if present
-    if (donation.notes) {
-      doc.fillColor(darkText).fontSize(9).font('Helvetica-Oblique').text(`Note: ${donation.notes}`, 40, 502, { width: 515 });
+    let headerBuf = parseImageBuffer(settings.headerImage);
+    if (!headerBuf && fs.existsSync(path.join(templateDir, 'header.png'))) {
+      headerBuf = fs.readFileSync(path.join(templateDir, 'header.png'));
     }
 
-    // Thank You Message Box
-    doc.rect(40, 530, 515, 50).fill('#eff6ff');
-    doc.fillColor(primaryColor).fontSize(10).font('Helvetica-Bold').text('THANK YOU FOR YOUR NOBLE CONTRIBUTION!', 55, 545, { align: 'center' });
-    doc.fillColor(darkText).fontSize(8).font('Helvetica').text('Your generous support helps us continue our philanthropic services and community programs.', 55, 560, { align: 'center' });
+    let footerBuf = parseImageBuffer(settings.footerImage);
+    if (!footerBuf && fs.existsSync(path.join(templateDir, 'footer.png'))) {
+      footerBuf = fs.readFileSync(path.join(templateDir, 'footer.png'));
+    }
 
-    // Authorization & Signature Section
-    doc.lineCap('butt').lineWidth(1).moveTo(380, 640).lineTo(535, 640).stroke(borderColor);
-    doc.fillColor(darkText).fontSize(9).font('Helvetica-Bold').text('Authorized Signatory', 380, 646, { width: 155, align: 'center' });
-    doc.fontSize(8).font('Helvetica').text(donation.confirmedByName || 'Trustee / Finance Admin', 380, 658, { width: 155, align: 'center' });
+    // ==========================================
+    // 1. HEADER SECTION (22 cm x 2.5 cm)
+    // ==========================================
+    if (headerBuf) {
+      try {
+        doc.image(headerBuf, 0, 0, { width: PAGE_WIDTH, height: HEADER_HEIGHT });
+      } catch {
+        renderDefaultHeader(doc, settings, PAGE_WIDTH, HEADER_HEIGHT);
+      }
+    } else {
+      renderDefaultHeader(doc, settings, PAGE_WIDTH, HEADER_HEIGHT);
+    }
 
-    // Footer
-    doc.fontSize(8).fillColor('#9ca3af').text('This is a computer-generated donation receipt.', 40, 720, { align: 'center' });
+    // ==========================================
+    // 2. BODY SECTION (22 cm x 6.5 cm) - Receipt Content
+    // ==========================================
+    const yBody = HEADER_HEIGHT; // 70.87 pt
+    const primaryColor = '#1e3a8a';
+    const darkText = '#1f2937';
+
+    // Body Background & Outer Outline
+    doc.rect(0, yBody, PAGE_WIDTH, BODY_HEIGHT).fill('#f8fafc');
+    doc.rect(10, yBody + 4, PAGE_WIDTH - 20, BODY_HEIGHT - 8).stroke('#cbd5e1');
+
+    // Metadata Bar: Receipt No, Date, Donation ID
+    doc.fillColor(primaryColor).fontSize(8.5).font('Helvetica-Bold').text(`${receiptNoLbl}: ${receiptNo}`, 20, yBody + 12);
+    doc.fillColor(darkText).fontSize(8.5).font('Helvetica-Bold').text(`${dateLbl}: ${donation.donationDate}`, 260, yBody + 12);
+    doc.fillColor(primaryColor).fontSize(8.5).font('Helvetica-Bold').text(`${idLbl}: ${donation.id}`, 470, yBody + 12);
+
+    doc.lineWidth(0.5).moveTo(20, yBody + 26).lineTo(PAGE_WIDTH - 20, yBody + 26).stroke('#e2e8f0');
+
+    // Name row
+    const yName = yBody + 32;
+    doc.fillColor('#475569').fontSize(8.5).font('Helvetica-Bold').text(donorNameLbl, 20, yName);
+    doc.fillColor('#0f172a').fontSize(10.5).font('Helvetica-Bold').text(donation.donorName, 140, yName, { width: 460 });
+
+    // Category / Purpose & Payment Info row
+    const yRow2 = yBody + 52;
+    doc.fillColor('#475569').fontSize(8).font('Helvetica-Bold').text(purposeLbl, 20, yRow2);
+    doc.fillColor(darkText).fontSize(8.5).font('Helvetica-Bold').text(donation.donationTypeName || 'GENERAL', 95, yRow2);
+
+    doc.fillColor('#475569').fontSize(8).font('Helvetica-Bold').text(paymentModeLbl, 240, yRow2);
+    doc.fillColor(darkText).fontSize(8.5).font('Helvetica-Bold').text(donation.paymentMode, 340, yRow2);
+
+    if (donation.transactionRef) {
+      doc.fillColor('#475569').fontSize(8).font('Helvetica-Bold').text(`${refLbl} ${donation.transactionRef}`, 460, yRow2);
+    }
+
+    // Amount Box: Number & Words
+    const yAmountBox = yBody + 72;
+    doc.rect(20, yAmountBox, PAGE_WIDTH - 40, 48).fill('#f0fdf4').stroke('#86efac');
+
+    const amountStr = formatCurrencyIN(donation.amount);
+    const amountInWords = numberToWordsIndian(donation.amount);
+
+    doc.fillColor('#166534').fontSize(9).font('Helvetica-Bold').text(amountLbl, 30, yAmountBox + 8);
+    doc.fillColor('#15803d').fontSize(12.5).font('Helvetica-Bold').text(amountStr, 145, yAmountBox + 6);
+
+    doc.fillColor('#166534').fontSize(8.5).font('Helvetica-Bold').text(amountInWordsLbl, 30, yAmountBox + 28);
+    doc.fillColor('#14532d').fontSize(9).font('Helvetica-Bold').text(amountInWords, 155, yAmountBox + 28, { width: PAGE_WIDTH - 195 });
+
+    // Remarks & Signatory row
+    const yRow4 = yBody + 130;
+    if (donation.notes) {
+      doc.fillColor('#64748b').fontSize(7.5).font('Helvetica-Oblique').text(`Remarks: ${donation.notes}`, 20, yRow4, { width: 380 });
+    } else {
+      doc.fillColor('#64748b').fontSize(7.5).font('Helvetica-Oblique').text(thanksNotesLbl, 20, yRow4, { width: 380 });
+    }
+
+    doc.lineWidth(0.8).moveTo(420, yBody + 155).lineTo(600, yBody + 155).stroke('#cbd5e1');
+    doc.fillColor('#334155').fontSize(8).font('Helvetica-Bold').text(signatoryLbl, 420, yBody + 158, { width: 180, align: 'center' });
+    if (donation.confirmedByName) {
+      doc.fillColor('#64748b').fontSize(7.5).font('Helvetica').text(donation.confirmedByName, 420, yBody + 168, { width: 180, align: 'center' });
+    }
+
+    // ==========================================
+    // 3. FOOTER SECTION (22 cm x 2.0 cm)
+    // ==========================================
+    const yFooter = HEADER_HEIGHT + BODY_HEIGHT; // 255.12 pt
+
+    if (footerBuf) {
+      try {
+        doc.image(footerBuf, 0, yFooter, { width: PAGE_WIDTH, height: FOOTER_HEIGHT });
+      } catch {
+        renderDefaultFooter(doc, settings, PAGE_WIDTH, yFooter, FOOTER_HEIGHT);
+      }
+    } else {
+      renderDefaultFooter(doc, settings, PAGE_WIDTH, yFooter, FOOTER_HEIGHT);
+    }
 
     doc.end();
 
     writeStream.on('finish', () => resolve());
     writeStream.on('error', (err) => reject(err));
   });
+}
+
+function renderDefaultHeader(doc: typeof PDFDocument.prototype, settings: Settings, width: number, height: number) {
+  doc.rect(0, 0, width, height).fill('#1e293b');
+  doc.fillColor('#ffffff').fontSize(15).font('Helvetica-Bold').text(settings.orgName.toUpperCase(), 15, 12, { width: width - 30, align: 'center' });
+  doc.fillColor('#cbd5e1').fontSize(8.5).font('Helvetica').text(settings.orgAddress, 15, 33, { width: width - 30, align: 'center' });
+  doc.fontSize(8).text(`Phone: ${settings.orgMobile} | Email: ${settings.orgEmail}`, 15, 48, { width: width - 30, align: 'center' });
+}
+
+function renderDefaultFooter(doc: typeof PDFDocument.prototype, settings: Settings, width: number, y: number, height: number) {
+  doc.rect(0, y, width, height).fill('#0f172a');
+  const notice = settings.officialNotice || 'THIS IS AN OFFICIAL COMPUTER GENERATED DONATION RECEIPT';
+  const subNotice = `Subject to realization of payment. Thank you for supporting ${settings.orgName}.`;
+  doc.fillColor('#94a3b8').fontSize(7.5).font('Helvetica-Bold').text(notice, 0, y + 16, { width, align: 'center' });
+  doc.fillColor('#64748b').fontSize(7).font('Helvetica').text(subNotice, 0, y + 30, { width, align: 'center' });
 }

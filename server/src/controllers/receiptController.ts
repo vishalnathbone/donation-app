@@ -13,7 +13,6 @@ export class ReceiptController {
 
       let receipt = await receiptService.getReceiptByNo(year, id);
       if (!receipt) {
-        // Try looking up by donationId
         const { getReceiptRepository } = await import('../repositories');
         const repo = getReceiptRepository();
         receipt = await repo.findByDonationId(year, id);
@@ -41,14 +40,37 @@ export class ReceiptController {
       let receiptNo = id;
       let receipt = await receiptService.getReceiptByNo(year, id);
       if (!receipt) {
-        const { JsonReceiptRepository } = await import('../repositories/jsonRepository');
-        const repo = new JsonReceiptRepository();
+        const { getReceiptRepository } = await import('../repositories');
+        const repo = getReceiptRepository();
         receipt = await repo.findByDonationId(year, id);
         if (receipt) receiptNo = receipt.receiptNo;
       }
 
+      // If receipt record is not found, check if `id` is a Donation ID
       if (!receipt) {
-        res.status(404).json({ success: false, message: 'Receipt not found' });
+        const { DonationService } = await import('../services/donationService');
+        const donationService = new DonationService();
+        const donation = await donationService.getDonationById(year, id);
+
+        if (donation) {
+          if (donation.status === 'APPROVED') {
+            receipt = await receiptService.generateReceiptForDonation(year, donation, req.user?.userId || 'SYSTEM');
+            receiptNo = receipt.receiptNo;
+          } else {
+            res.status(400).json({
+              success: false,
+              message: `Donation ${id} is currently ${donation.status}. Receipts can only be generated for APPROVED donations.`,
+            });
+            return;
+          }
+        }
+      }
+
+      if (!receipt) {
+        res.status(404).json({
+          success: false,
+          message: `Receipt not found for '${id}'. Please verify the Receipt Number or Donation ID.`,
+        });
         return;
       }
 

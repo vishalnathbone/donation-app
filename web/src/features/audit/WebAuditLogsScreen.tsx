@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { useAuditLogs } from '../../hooks/useDonationQueries';
+import { useLanguageStore } from '../../store/languageStore';
 import { formatDate } from '../../utils/formatters';
 import { History, ShieldCheck, Search } from '../../utils/icons';
 
 export const WebAuditLogsScreen: React.FC = () => {
   const { data: logs = [], isLoading } = useAuditLogs();
+  const { t } = useLanguageStore();
   const [searchTerm, setSearchTerm] = useState('');
 
   const filteredLogs = logs.filter(
@@ -22,7 +24,7 @@ export const WebAuditLogsScreen: React.FC = () => {
         <div>
           <h2 className="text-xl lg:text-2xl font-black text-white tracking-tight flex items-center gap-2">
             <History size={24} color="#818cf8" />
-            <span>Immutable System Audit Log</span>
+            <span>{t('auditLedger')}</span>
           </h2>
           <p className="text-xs text-slate-300 mt-1">
             Complete audit trail tracking all donation additions, expense approvals, user role changes, and system events.

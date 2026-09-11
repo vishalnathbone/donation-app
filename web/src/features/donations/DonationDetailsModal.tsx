@@ -4,6 +4,8 @@ import { formatCurrency, formatDate } from '../../utils/formatters';
 import { StatusBadge } from '../../components/StatusBadge';
 import { whatsAppService } from '../../services/whatsAppService';
 import { Heart, X, MessageCircle, FileText } from '../../utils/icons';
+import { useAuthStore } from '../../store/authStore';
+import { useLanguageStore } from '../../store/languageStore';
 
 interface DonationDetailsModalProps {
   donation: Donation | null;
@@ -23,7 +25,10 @@ export const DonationDetailsModal: React.FC<DonationDetailsModalProps> = ({
   };
 
   const handleDownloadPdf = () => {
-    window.open(`/api/${donation.year}/receipts/${donation.id}/pdf`, '_blank');
+    const token = useAuthStore.getState().token;
+    const lang = useLanguageStore.getState().language;
+    const url = `/api/${donation.year}/receipts/${donation.id}/pdf?token=${encodeURIComponent(token || '')}&lang=${lang}`;
+    window.open(url, '_blank');
   };
 
   return (

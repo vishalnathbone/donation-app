@@ -70,11 +70,30 @@ export class ReceiptService {
     if (!receipt) {
       throw new Error(`Receipt ${receiptNo} not found`);
     }
-    const yearDir = JsonStorageHelper.getYearDir(year);
-    const pdfPath = path.join(yearDir, 'receipts', receipt.fileName);
-    if (!fs.existsSync(pdfPath)) {
-      throw new Error(`PDF file for receipt ${receiptNo} missing`);
+    const yearDir = await JsonStorageHelper.ensureYearDir(year);
+    const pdfPath = path.join(yearDir, 'receipts', `${receiptNo}.pdf`);
+
+    // Always generate/refresh the PDF file using latest Settings & layout images
+    const { getDonationRepository } = await import('../repositories');
+    const donationRepo = getDonationRepository();
+    const donation = await donationRepo.findById(year, receipt.donationId);
+
+    if (donation) {
+      const settings = (await this.settingsRepo.get(year)) || {
+        year,
+        orgName: 'Shree Krishna Seva Trust',
+        orgAddress: '108 Divine Complex, Temple Road, Mumbai, Maharashtra - 400001',
+        orgMobile: '+91 98765 43210',
+        orgEmail: 'info@krishnaseva.org',
+        receiptPrefix: 'REC',
+        donationPrefix: 'DON',
+        expensePrefix: 'EXP',
+      };
+      await generateReceiptPdf(donation, receiptNo, settings, pdfPath);
+    } else if (!fs.existsSync(pdfPath)) {
+      throw new Error(`PDF file for receipt ${receiptNo} missing and donation record not found`);
     }
+
     return pdfPath;
   }
 }

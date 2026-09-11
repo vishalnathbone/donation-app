@@ -20,6 +20,7 @@ import {
   BarChart2,
   Menu,
   X,
+  Image,
 } from '../utils/icons';
 
 export type ScreenId =
@@ -36,6 +37,7 @@ export type ScreenId =
   | 'reports-collection'
   | 'reports-financial'
   | 'donation-types'
+  | 'receipt-settings'
   | 'users'
   | 'audit-logs';
 
@@ -56,21 +58,22 @@ export const WebContainer: React.FC<WebContainerProps> = ({
 }) => {
   const { user, logout } = useAuthStore();
   const { selectedYear, setSelectedYear, availableYears } = useYearStore();
-  const { language, setLanguage } = useLanguageStore();
+  const { language, setLanguage, t } = useLanguageStore();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
   const isAuthScreen = currentScreen === 'login';
 
   const navigationItems = [
-    { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, roleRequired: null },
-    { id: 'dashboard-charts', label: 'Analytics & Charts', icon: BarChart2, roleRequired: null },
-    { id: 'donations-list', label: 'Donations Directory', icon: Heart, roleRequired: null },
-    { id: 'expenses-list', label: 'Expenses Directory', icon: DollarSign, roleRequired: null },
-    { id: 'reports-collection', label: 'Reports & Excel Export', icon: BarChart3, roleRequired: null },
-    { id: 'donation-types', label: 'Donation Categories', icon: Tag, roleRequired: null },
-    { id: 'users', label: 'User Management', icon: UsersIcon, roleRequired: 'ADMIN' },
-    { id: 'audit-logs', label: 'System Audit Ledger', icon: History, roleRequired: 'ADMIN' },
+    { id: 'dashboard', label: t('dashboard'), icon: LayoutDashboard, roleRequired: null },
+    { id: 'dashboard-charts', label: t('analytics'), icon: BarChart2, roleRequired: null },
+    { id: 'donations-list', label: t('donationsDirectory'), icon: Heart, roleRequired: null },
+    { id: 'expenses-list', label: t('expensesDirectory'), icon: DollarSign, roleRequired: null },
+    { id: 'reports-collection', label: t('reportsExcel'), icon: BarChart3, roleRequired: null },
+    { id: 'donation-types', label: t('donationCategories'), icon: Tag, roleRequired: null },
+    { id: 'receipt-settings', label: t('receiptSettings'), icon: Image, roleRequired: 'ADMIN' },
+    { id: 'users', label: t('userManagement'), icon: UsersIcon, roleRequired: 'ADMIN' },
+    { id: 'audit-logs', label: t('auditLedger'), icon: History, roleRequired: 'ADMIN' },
   ];
 
   const userRole = user?.role || 'VIEWER';

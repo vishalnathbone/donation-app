@@ -7,6 +7,7 @@ import { WebDonationsScreen } from './features/donations/WebDonationsScreen';
 import { WebExpensesScreen } from './features/expenses/WebExpensesScreen';
 import { WebReportsScreen } from './features/reports/WebReportsScreen';
 import { WebCategoryManagementScreen } from './features/categories/WebCategoryManagementScreen';
+import { WebReceiptSettingsScreen } from './features/settings/WebReceiptSettingsScreen';
 import { WebUserManagementScreen } from './features/users/WebUserManagementScreen';
 import { WebAuditLogsScreen } from './features/audit/WebAuditLogsScreen';
 import { QRCodeScannerModal } from './components/QRCodeScannerModal';
@@ -60,6 +61,8 @@ export const AppContent: React.FC = () => {
         return { title: 'Reports & Financial Statements' };
       case 'donation-types':
         return { title: 'Donation Purpose Categories' };
+      case 'receipt-settings':
+        return { title: 'Receipt Customization & Layout Settings' };
       case 'users':
         return { title: 'User Account Management' };
       case 'audit-logs':
@@ -129,6 +132,9 @@ export const AppContent: React.FC = () => {
 
       case 'donation-types':
         return <WebCategoryManagementScreen />;
+
+      case 'receipt-settings':
+        return <WebReceiptSettingsScreen />;
 
       case 'users':
         return <WebUserManagementScreen />;

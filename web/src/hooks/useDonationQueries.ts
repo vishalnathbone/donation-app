@@ -9,7 +9,33 @@ import {
   CollectionSummaryReport,
   AuditLog,
   User,
+  Settings,
 } from '../types';
+
+export const useSettings = () => {
+  const { selectedYear } = useYearStore();
+  return useQuery<Settings>({
+    queryKey: ['settings', selectedYear],
+    queryFn: async () => {
+      const res = await apiClient.get(`/api/${selectedYear}/settings`);
+      return res.data.data ?? res.data;
+    },
+  });
+};
+
+export const useUpdateSettings = () => {
+  const { selectedYear } = useYearStore();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (payload: Partial<Settings>) => {
+      const res = await apiClient.put(`/api/${selectedYear}/settings`, payload);
+      return res.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['settings', selectedYear] });
+    },
+  });
+};
 
 export const useDashboardSummary = () => {
   const { selectedYear } = useYearStore();

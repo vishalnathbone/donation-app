@@ -240,6 +240,20 @@ function mapSettingsFromRow(row: any): Settings {
     receiptPrefix: row.receipt_prefix,
     donationPrefix: row.donation_prefix,
     expensePrefix: row.expense_prefix,
+    headerImage: row.header_image || undefined,
+    footerImage: row.footer_image || undefined,
+    receiptNoLabel: row.receipt_no_label || undefined,
+    dateLabel: row.date_label || undefined,
+    idLabel: row.id_label || undefined,
+    donorNameLabel: row.donor_name_label || undefined,
+    purposeLabel: row.purpose_label || undefined,
+    paymentModeLabel: row.payment_mode_label || undefined,
+    refLabel: row.ref_label || undefined,
+    amountLabel: row.amount_label || undefined,
+    amountInWordsLabel: row.amount_in_words_label || undefined,
+    signatoryLabel: row.signatory_label || undefined,
+    thanksNotes: row.thanks_notes || undefined,
+    officialNotice: row.official_notice || undefined,
   };
 }
 
@@ -253,6 +267,20 @@ function mapSettingsToRow(s: Settings | Partial<Settings>): Record<string, any> 
   if (s.receiptPrefix !== undefined) row.receipt_prefix = s.receiptPrefix;
   if (s.donationPrefix !== undefined) row.donation_prefix = s.donationPrefix;
   if (s.expensePrefix !== undefined) row.expense_prefix = s.expensePrefix;
+  if (s.headerImage !== undefined) row.header_image = s.headerImage;
+  if (s.footerImage !== undefined) row.footer_image = s.footerImage;
+  if (s.receiptNoLabel !== undefined) row.receipt_no_label = s.receiptNoLabel;
+  if (s.dateLabel !== undefined) row.date_label = s.dateLabel;
+  if (s.idLabel !== undefined) row.id_label = s.idLabel;
+  if (s.donorNameLabel !== undefined) row.donor_name_label = s.donorNameLabel;
+  if (s.purposeLabel !== undefined) row.purpose_label = s.purposeLabel;
+  if (s.paymentModeLabel !== undefined) row.payment_mode_label = s.paymentModeLabel;
+  if (s.refLabel !== undefined) row.ref_label = s.refLabel;
+  if (s.amountLabel !== undefined) row.amount_label = s.amountLabel;
+  if (s.amountInWordsLabel !== undefined) row.amount_in_words_label = s.amountInWordsLabel;
+  if (s.signatoryLabel !== undefined) row.signatory_label = s.signatoryLabel;
+  if (s.thanksNotes !== undefined) row.thanks_notes = s.thanksNotes;
+  if (s.officialNotice !== undefined) row.official_notice = s.officialNotice;
   return row;
 }
 

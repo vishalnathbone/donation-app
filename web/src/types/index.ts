@@ -141,3 +141,29 @@ export interface AuditLog {
   oldValue?: Record<string, any>;
   newValue?: Record<string, any>;
 }
+
+export interface Settings {
+  year: number;
+  orgName: string;
+  orgAddress: string;
+  orgMobile: string;
+  orgEmail: string;
+  receiptPrefix: string;
+  donationPrefix: string;
+  expensePrefix: string;
+  headerImage?: string;
+  footerImage?: string;
+  // Custom Receipt Text Labels (side-by-side against standard English text)
+  receiptNoLabel?: string;
+  dateLabel?: string;
+  idLabel?: string;
+  donorNameLabel?: string;
+  purposeLabel?: string;
+  paymentModeLabel?: string;
+  refLabel?: string;
+  amountLabel?: string;
+  amountInWordsLabel?: string;
+  signatoryLabel?: string;
+  thanksNotes?: string;
+  officialNotice?: string;
+}
